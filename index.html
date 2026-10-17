@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alcovia · GTM Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============ SIDEBAR / TABS ============ -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div>
+          <div class="brand-name">Alcovia GTM</div>
+          <div class="brand-sub">Growth Command Center</div>
+        </div>
+      </div>
+
+      <div class="nav-label">Sections</div>
+      <nav class="nav" id="nav">
+        <button class="navlink active" data-page="overview"><span class="dot"></span>Snapshots</button>
+        <button class="navlink" data-page="revenue"><span class="dot"></span>Revenue</button>
+        <button class="navlink" data-page="funnel"><span class="dot"></span>Funnel Journey</button>
+        <button class="navlink" data-page="campaigns"><span class="dot"></span>Campaign Performance</button>
+        <button class="navlink" data-page="rca"><span class="dot"></span>RCA &amp; Actions</button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="chip"><span class="pulse"></span><span id="lastUpdated">Live · dummy dataset</span></div>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <h1 id="pageHeading">Snapshots</h1>
+          <p id="rangeSub">Revenue · Funnel · Campaign performance</p>
+        </div>
+        <div class="topbar-spacer"></div>
+        <div class="control">
+          <div class="select-wrap">
+            <select id="period" aria-label="Select timeline">
+              <option value="7d">Last 7 days</option>
+              <option value="30d" selected>Last 30 days</option>
+              <option value="qtd">This quarter</option>
+              <option value="ytd">This year</option>
+            </select>
+          </div>
+          <button class="btn" id="printBtn" title="Export / print">Export</button>
+          <button class="btn icon" id="themeBtn" title="Toggle theme">◐</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- ================= SNAPSHOTS ================= -->
+        <section class="page active" data-page="overview">
+          <div class="section-head">
+            <span class="eyebrow">Snapshot</span>
+            <h2>Headline metrics</h2>
+            <span class="hint">Dummy data for the selected timeline</span>
+          </div>
+          <div class="kpis" id="kpis"></div>
+          <div style="margin-top:16px">
+            <div class="insight" id="topInsight"></div>
+          </div>
+        </section>
+
+        <!-- ================= REVENUE ================= -->
+        <section class="page" data-page="revenue">
+          <div class="section-head">
+            <span class="eyebrow">Revenue</span>
+            <h2>Target vs achievement</h2>
+            <span class="hint" id="revHint"></span>
+          </div>
+
+          <!-- 1. DEDICATED TARGET VS ACHIEVEMENT -->
+          <div class="card" id="tvaCard" style="margin-bottom:16px"></div>
+
+          <div class="grid cols-3">
+            <!-- 2. TREND -->
+            <div class="card span-2">
+              <div class="card-head">
+                <h3>Revenue trend vs target pace</h3>
+                <span class="sub" id="revTrendSub"></span>
+              </div>
+              <div class="chart" id="revChart"></div>
+              <div class="legend">
+                <span class="li"><span class="sw" style="background:#5b5bf0"></span>Program revenue</span>
+                <span class="li"><span class="sw" style="background:#8b5cf6"></span>Workshop revenue</span>
+                <span class="li"><span class="sw" style="background:#f59e0b"></span>Target pace</span>
+              </div>
+            </div>
+
+            <!-- 3. MIX -->
+            <div class="card">
+              <div class="card-head"><h3>Program vs workshop mix</h3></div>
+              <div class="donut-wrap">
+                <div class="donut" id="revDonut"></div>
+                <div style="flex:1" id="revDonutLegend"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid cols-3" style="margin-top:16px">
+            <!-- 4. TRIALS VS FULL -->
+            <div class="card">
+              <div class="card-head"><h3>Trials vs full program</h3><span class="sub">3-month trials</span></div>
+              <div id="trialSplit"></div>
+            </div>
+            <!-- 5. ONBOARDED -->
+            <div class="card">
+              <div class="card-head"><h3>Students onboarded</h3><span class="sub" id="onboardSub"></span></div>
+              <div class="chart" id="onboardChart"></div>
+            </div>
+            <!-- 6. WORKSHOPS -->
+            <div class="card">
+              <div class="card-head"><h3>Workshop revenue</h3><span class="sub">₹3,999 / seat · Razorpay</span></div>
+              <div id="workshopStats"></div>
+            </div>
+          </div>
+
+          <div class="grid cols-2" style="margin-top:16px">
+            <!-- 7. INVOICES -->
+            <div class="card">
+              <div class="card-head"><h3>Invoices generated · not paid</h3><span class="sub" id="invoiceSub"></span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Client</th><th>Invoice</th><th class="num">Amount</th><th class="num">Age</th><th>Status</th></tr></thead>
+                  <tbody id="invoiceRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <!-- 8. RENEWALS -->
+            <div class="card">
+              <div class="card-head"><h3>Renewals coming up</h3><span class="sub">3-month trial teens</span></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Teen</th><th>Plan</th><th class="num">Days left</th><th>Risk</th></tr></thead>
+                  <tbody id="renewalRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= FUNNEL ================= -->
+        <section class="page" data-page="funnel">
+          <div class="section-head">
+            <span class="eyebrow">Funnel</span>
+            <h2>Meta Ads journey</h2>
+            <span class="hint">Total leads → Qualified → Call → Interview → Architect → Sign-up</span>
+          </div>
+
+          <!-- SEPARATE METRIC CARDS -->
+          <div class="mgrid three" id="funnelMetricCards" style="margin-bottom:16px"></div>
+
+          <div class="card">
+            <div class="card-head"><h3>Stage-by-stage funnel</h3><span class="sub" id="funnelSub"></span></div>
+            <div id="funnelViz"></div>
+          </div>
+
+          <div style="margin-top:16px">
+            <div class="insight" id="funnelInsight"></div>
+          </div>
+        </section>
+
+        <!-- ================= CAMPAIGNS ================= -->
+        <section class="page" data-page="campaigns">
+          <div class="section-head">
+            <span class="eyebrow">Campaigns</span>
+            <h2>Workshop &amp; program performance</h2>
+            <span class="hint">CTR · frequency · landing page health</span>
+          </div>
+
+          <!-- SEPARATE HIGHLIGHT CARDS -->
+          <div class="mgrid three" id="campHighlights" style="margin-bottom:16px"></div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Ad set performance</h3>
+              <div style="margin-left:auto" class="seg" id="campFilter">
+                <button data-f="all" class="active">All</button>
+                <button data-f="workshop">Workshop</button>
+                <button data-f="program">Program</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Campaign</th><th>Type</th>
+                    <th class="num">Spend</th><th class="num">Impr.</th>
+                    <th class="num">CTR</th><th class="num">Freq.</th>
+                    <th class="num">Sign-ups</th><th class="num">Cost/Sign-up</th>
+                    <th>LP drop-off</th><th class="num">Load (s)</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="campaignRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="margin-top:16px">
+            <div class="insight" id="campInsight"></div>
+          </div>
+        </section>
+
+        <!-- ================= RCA ================= -->
+        <section class="page" data-page="rca">
+          <div class="section-head">
+            <span class="eyebrow">RCA</span>
+            <h2>Which to drop · refresh · scale</h2>
+            <span class="hint">Root-cause across spend, CTR, frequency &amp; conversion</span>
+          </div>
+          <div class="rca" id="rcaBoard"></div>
+          <div style="margin-top:16px">
+            <div class="insight" id="rcaInsight"></div>
+          </div>
+        </section>
+
+        <footer class="muted" style="font-size:11.5px;padding-top:8px;border-top:1px solid var(--line-2)">
+          Alcovia · Product, Systems &amp; Analytics — GTM tracker prototype. Data shown is illustrative.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- ============ DRILL-DOWN MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button class="btn icon" id="modalClose" data-close title="Close">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
