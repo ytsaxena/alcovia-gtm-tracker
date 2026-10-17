@@ -55,13 +55,11 @@ const PAGE_TITLES = {
 };
 
 /* ---------- roles (no-auth gate) ---------- */
-const STUDENT_DASH_URL = "https://ytsaxena.github.io/alcovia-product/student-dashboard/";
 const ROLES = {
   founder:   { icon: "◆", name: "Founder / Leadership", page: "overview",  persona: "all",       blurb: "Complete view — revenue, funnel, campaigns, all personas & systems health." },
   sales:     { icon: "▲", name: "Sales",                 page: "funnel",    persona: "sales",     blurb: "Own the Meta-ads funnel. North-star: win rate & discovery show-up." },
   marketing: { icon: "●", name: "Marketing",             page: "revenue",   persona: "marketing", blurb: "Drive leads profitably. North-star: CAC, ROAS & dormant-lead %." },
   product:   { icon: "■", name: "Product",               page: "scorecard", persona: "product",   blurb: "Activate, engage & retain. North-star: retention, WAU & trial→paid." },
-  advisor:   { icon: "✚", name: "Academic Advisor",      route: STUDENT_DASH_URL, blurb: "Opens the Student Progress dashboard — the Alcovian & parent journey." },
 };
 
 function makeLabels(p) {
