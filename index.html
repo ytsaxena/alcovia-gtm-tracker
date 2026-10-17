@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- ============ ROLE SELECT (no auth) ============ -->
+  <div class="role-screen" id="roleScreen">
+    <div class="role-box">
+      <div class="role-brand">A</div>
+      <h1>Alcovia · Growth Command Center</h1>
+      <p class="role-sub">Pick who you are — the dashboard opens to your view. No password, this is a prototype role gate. All metrics live in one place.</p>
+      <div class="role-grid" id="roleGrid"></div>
+      <div class="role-foot">Unified from ClickUp · Smallest.ai · N8N · App events · Meta Ads · Razorpay</div>
+    </div>
+  </div>
+
   <div class="app">
     <!-- ============ SIDEBAR / TABS ============ -->
     <aside class="sidebar">
@@ -25,6 +36,8 @@
         <button class="navlink" data-page="funnel"><span class="dot"></span>Funnel Journey</button>
         <button class="navlink" data-page="campaigns"><span class="dot"></span>Campaign Performance</button>
         <button class="navlink" data-page="rca"><span class="dot"></span>RCA &amp; Actions</button>
+        <button class="navlink" data-page="scorecard"><span class="dot"></span>Persona Scorecard</button>
+        <button class="navlink" data-page="systems"><span class="dot"></span>Systems Health</button>
       </nav>
 
       <div class="sidebar-foot">
@@ -41,6 +54,7 @@
         </div>
         <div class="topbar-spacer"></div>
         <div class="control">
+          <button class="btn role-chip" id="roleChip" title="Switch role"><span class="rc-dot"></span><span id="roleName">Viewer</span></button>
           <div class="select-wrap">
             <select id="period" aria-label="Select timeline">
               <option value="7d">Last 7 days</option>
@@ -220,6 +234,54 @@
           <div style="margin-top:16px">
             <div class="insight" id="rcaInsight"></div>
           </div>
+        </section>
+
+        <!-- ================= PERSONA SCORECARD ================= -->
+        <section class="page" data-page="scorecard">
+          <div class="section-head">
+            <span class="eyebrow">Scorecard</span>
+            <h2>One scorecard · Sales &amp; Marketing &amp; Product</h2>
+            <span class="hint">North-stars, a cross-persona matrix, then each persona's KPIs — all in one view</span>
+          </div>
+          <div class="kpis" id="northStars"></div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head"><h3>Scorecard matrix — category × persona</h3><span class="sub" id="matrixSub"></span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Category</th><th>Sales</th><th>Marketing</th><th>Product</th></tr></thead>
+              <tbody id="matrixRows"></tbody>
+            </table></div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head">
+              <h3>Persona detail</h3>
+              <div style="margin-left:auto" class="seg" id="scoreToggle">
+                <button data-p="all" class="active">All</button>
+                <button data-p="sales">Sales</button>
+                <button data-p="marketing">Marketing</button>
+                <button data-p="product">Product</button>
+              </div>
+            </div>
+            <div id="scorePersona"></div>
+          </div>
+          <div style="margin-top:16px"><div class="insight" id="ovInsight"></div></div>
+        </section>
+
+        <!-- ================= SYSTEMS ================= -->
+        <section class="page" data-page="systems">
+          <div class="section-head">
+            <span class="eyebrow">Systems</span>
+            <h2>Data sources &amp; automation health</h2>
+            <span class="hint">What feeds the dashboard · sync cadence · gaps to close</span>
+          </div>
+          <div class="mgrid three" id="sourceCards" style="margin-bottom:16px"></div>
+          <div class="card">
+            <div class="card-head"><h3>Automation flows (N8N)</h3><span class="sub">last 30 days</span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Flow</th><th>Feeds</th><th class="num">Runs</th><th class="num">Failed</th><th class="num">Uptime</th><th>Status</th></tr></thead>
+              <tbody id="flowRows"></tbody>
+            </table></div>
+          </div>
+          <div style="margin-top:16px"><div class="insight" id="gapInsight"></div></div>
         </section>
 
         <footer class="muted" style="font-size:11.5px;padding-top:8px;border-top:1px solid var(--line-2)">

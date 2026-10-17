@@ -50,6 +50,18 @@ const PAGE_TITLES = {
   funnel: "Funnel Journey",
   campaigns: "Campaign Performance",
   rca: "RCA & Actions",
+  scorecard: "Persona Scorecard",
+  systems: "Systems Health",
+};
+
+/* ---------- roles (no-auth gate) ---------- */
+const STUDENT_DASH_URL = "https://ytsaxena.github.io/alcovia-product/student-dashboard/";
+const ROLES = {
+  founder:   { icon: "◆", name: "Founder / Leadership", page: "overview",  persona: "all",       blurb: "Complete view — revenue, funnel, campaigns, all personas & systems health." },
+  sales:     { icon: "▲", name: "Sales",                 page: "funnel",    persona: "sales",     blurb: "Own the Meta-ads funnel. North-star: win rate & discovery show-up." },
+  marketing: { icon: "●", name: "Marketing",             page: "revenue",   persona: "marketing", blurb: "Drive leads profitably. North-star: CAC, ROAS & dormant-lead %." },
+  product:   { icon: "■", name: "Product",               page: "scorecard", persona: "product",   blurb: "Activate, engage & retain. North-star: retention, WAU & trial→paid." },
+  advisor:   { icon: "✚", name: "Academic Advisor",      route: STUDENT_DASH_URL, blurb: "Opens the Student Progress dashboard — the Alcovian & parent journey." },
 };
 
 function makeLabels(p) {
@@ -502,6 +514,162 @@ function renderRCA(d) {
     is the fastest efficiency win. Refresh fatigued sets (freq ≥ 3) in parallel to protect CTR as volume grows.</div>`);
 }
 
+/* ---------- scorecard: data (ported from persona scorecard) ---------- */
+const SCORE_F = { "7d": 0.25, "30d": 1, "qtd": 3.1, "ytd": 11 };
+const NORTH = [
+  { name: "Conversion (Lead → Paid)", base: 5.7, target: 6, unit: "%", dir: "up", owner: "Shared" },
+  { name: "CAC", base: 6800, target: 5500, unit: "₹", dir: "down", owner: "Marketing" },
+  { name: "LTV : CAC", base: 3.2, target: 3, unit: "×", dir: "down", owner: "Shared" },
+  { name: "Retention (D30)", base: 62, target: 70, unit: "%", dir: "up", owner: "Product" },
+  { name: "NPS", base: 41, target: 50, unit: "", dir: "up", owner: "Product" },
+];
+const P_SALES = [
+  { name: "Leads contacted", src: "ClickUp", base: 412, target: 450, unit: "", dir: "up", type: "volume" },
+  { name: "Lead → Won", src: "ClickUp", base: 18, target: 20, unit: "%", dir: "up" },
+  { name: "Win rate", src: "ClickUp", base: 34, target: 40, unit: "%", dir: "up" },
+  { name: "Show-up rate", src: "Smallest.ai", base: 71, target: 75, unit: "%", dir: "up" },
+  { name: "Touchpoints / lead", src: "ClickUp", base: 4.1, target: 4, unit: "", dir: "up" },
+  { name: "First-response time", src: "ClickUp/N8N", base: 2.4, target: 2, unit: "h", dir: "down" },
+  { name: "Revenue / rep", src: "Razorpay", base: 420000, target: 450000, unit: "₹L", dir: "up", type: "volume" },
+  { name: "Revenue / lead", src: "Razorpay", base: 1850, target: 2000, unit: "₹", dir: "up" },
+  { name: "Renewal rate", src: "ClickUp", base: 62, target: 70, unit: "%", dir: "up" },
+  { name: "Sales-cycle length", src: "ClickUp", base: 21, target: 18, unit: "d", dir: "down" },
+  { name: "Quota attainment", src: "ClickUp", base: 84, target: 100, unit: "%", dir: "up" },
+];
+const P_MARKETING = [
+  { name: "Leads by source", src: "ClickUp/Meta", base: 4, target: 4, unit: " ch", dir: "up" },
+  { name: "CPL", src: "Ads/Razorpay", base: 142, target: 150, unit: "₹", dir: "down" },
+  { name: "MQL rate", src: "ClickUp", base: 41, target: 40, unit: "%", dir: "up" },
+  { name: "Nurture → conversion", src: "ClickUp/N8N", base: 9, target: 12, unit: "%", dir: "up" },
+  { name: "Open / click / reply", src: "Messaging", base: 19, target: 21, unit: "%", dir: "up" },
+  { name: "Nurture completion", src: "N8N", base: 73, target: 80, unit: "%", dir: "up" },
+  { name: "CAC", src: "Ads/Razorpay", base: 6800, target: 5500, unit: "₹", dir: "down" },
+  { name: "ROAS", src: "Ads/Razorpay", base: 2.9, target: 3.5, unit: "×", dir: "up" },
+  { name: "Dormant lead %", src: "ClickUp", base: 27, target: 15, unit: "%", dir: "down" },
+  { name: "Channel ROI", src: "Ads/Razorpay", base: 2.1, target: 2.5, unit: "×", dir: "up" },
+];
+const P_PRODUCT = [
+  { name: "Activation", src: "App", base: 64, target: 70, unit: "%", dir: "up" },
+  { name: "Trial → paid", src: "App/Razorpay", base: 38, target: 40, unit: "%", dir: "up" },
+  { name: "WAU (of ~20)", src: "App", base: 13, target: 18, unit: "", dir: "up" },
+  { name: "Feature adoption (Realm)", src: "App", base: 65, target: 85, unit: "%", dir: "up" },
+  { name: "Session length", src: "App", base: 2.15, target: 30, unit: " min", dir: "up" },
+  { name: "ARPU", src: "App/Razorpay", base: 1450, target: 1600, unit: "₹", dir: "up" },
+  { name: "Expansion revenue", src: "Razorpay", base: 0, target: 50000, unit: "₹", dir: "up" },
+  { name: "D30 retention", src: "App", base: 62, target: 70, unit: "%", dir: "up" },
+  { name: "Churn", src: "App", base: 11, target: 8, unit: "%", dir: "down" },
+  { name: "NPS", src: "Survey", base: 41, target: 50, unit: "", dir: "up" },
+  { name: "Time-to-first-value", src: "App", base: 2.3, target: 3, unit: "d", dir: "down" },
+];
+const MATRIX = [
+  { cat: "Top of funnel", sales: ["Leads contacted", "412 / wk", "warn"], marketing: ["By source · CPL", "4 ch · ₹142", "good"], product: ["—", "", "na"] },
+  { cat: "Conversion", sales: ["Win rate · show-up", "34% · 71%", "warn"], marketing: ["MQL · nurture→conv", "41% · 9%", "warn"], product: ["Activation · trial→paid", "64% · 38%", "warn"] },
+  { cat: "Engagement", sales: ["1st response · touches", "2.4h · 4.1", "good"], marketing: ["Open / click / reply", "38/7/12%", "warn"], product: ["DAU/WAU/MAU", "6 / 13 / 20", "warn"] },
+  { cat: "Revenue", sales: ["Rev/rep · renewals", "₹4.2L · 58%", "good"], marketing: ["CAC · ROAS", "₹6.8k · 2.9×", "warn"], product: ["ARPU", "₹1,450", "good"] },
+  { cat: "Retention", sales: ["Renewal rate", "62%", "warn"], marketing: ["Dormant lead %", "27%", "bad"], product: ["D30 · churn", "62% · 11%", "warn"] },
+  { cat: "Efficiency", sales: ["Cycle · quota", "21d · 84%", "warn"], marketing: ["Cost/lead · ROI", "₹142 · 2.1×", "warn"], product: ["Time-to-first-value", "2.3d", "good"] },
+];
+const SOURCES = [
+  { name: "ClickUp", role: "CRM · funnel · comms", sync: "Every 15 min", fresh: "3 min", complete: 96, status: "good" },
+  { name: "Smallest.ai", role: "AI calls · outcomes", sync: "Hourly", fresh: "42 min", complete: 78, status: "warn" },
+  { name: "N8N", role: "Automation / orchestration", sync: "Real-time", fresh: "live", complete: 100, status: "good" },
+  { name: "App analytics", role: "Product event stream", sync: "Streaming", fresh: "live", complete: 88, status: "warn" },
+  { name: "Meta Ads", role: "Ad performance", sync: "Daily 6am", fresh: "6 h", complete: 100, status: "good" },
+  { name: "Razorpay", role: "Payments", sync: "Every 30 min", fresh: "18 min", complete: 99, status: "good" },
+];
+const FLOWS = [
+  { name: "Funnel sync", feeds: "Sales · Marketing", runs: 2880, failed: 12, uptime: 99.6, status: "good" },
+  { name: "Call outcome tagging", feeds: "Sales · Marketing", runs: 720, failed: 41, uptime: 94.3, status: "warn" },
+  { name: "Lead nurture sequences", feeds: "Marketing", runs: 1440, failed: 6, uptime: 99.6, status: "good" },
+  { name: "Deadline alerts → WA/SMS", feeds: "Sales · Product", runs: 540, failed: 3, uptime: 99.4, status: "good" },
+  { name: "Payment reconcile", feeds: "Sales", runs: 1440, failed: 0, uptime: 100, status: "good" },
+  { name: "App event → warehouse", feeds: "Product", runs: 43200, failed: 210, uptime: 99.5, status: "good" },
+];
+
+/* ---------- scorecard: helpers ---------- */
+function fmtVal(n, unit) {
+  if (unit === "₹") return "₹" + IN.format(Math.round(n));
+  if (unit === "₹L") return "₹" + (n / 100000).toFixed(1) + "L";
+  if (unit === "%") return (n % 1 ? n.toFixed(1) : n.toFixed(0)) + "%";
+  if (unit === "×") return n.toFixed(1) + "×";
+  if (unit === "h") return n.toFixed(1) + "h";
+  if (unit === "d") return Math.round(n) + "d";
+  if (unit === " min") return n.toFixed(2) + " min";
+  if (unit === " ch") return n.toFixed(0) + " ch";
+  return IN.format(Math.round(n));
+}
+function ragOf(cur, target, dir) {
+  if (dir === "down") return cur <= target ? "good" : cur <= target * 1.15 ? "warn" : "bad";
+  return cur >= target ? "good" : cur >= target * 0.85 ? "warn" : "bad";
+}
+const RAGTXT = { good: "Healthy", warn: "Watch", bad: "Act" };
+function dot(rag) { return `<span class="badge ${rag === "good" ? "scale" : rag === "warn" ? "refresh" : "drop"}">${RAGTXT[rag]}</span>`; }
+function ragColor(rag) { return rag === "good" ? "var(--success)" : rag === "warn" ? "var(--warn)" : "var(--danger)"; }
+const scaleVal = (base, type, f) => (type === "volume" ? base * f : base);
+
+function kpiCard(k, f, hl) {
+  const cur = scaleVal(k.base, k.type, f);
+  const rag = ragOf(cur, k.target, k.dir);
+  return `<div class="mcard${hl ? " hl" : ""}"><div class="mlab">${k.name}</div>
+    <div class="mval" style="color:${ragColor(rag)}">${fmtVal(cur, k.unit)}</div>
+    <div class="mmeta">target ${fmtVal(k.target, k.unit)} · ${k.src}</div></div>`;
+}
+function kpiRow(k, f) {
+  const cur = scaleVal(k.base, k.type, f);
+  const rag = ragOf(cur, k.target, k.dir);
+  return `<tr><td><span class="cname">${k.name}</span></td><td class="muted">${k.src}</td>
+    <td class="num"><b>${fmtVal(cur, k.unit)}</b></td><td class="num">${fmtVal(k.target, k.unit)}</td><td>${dot(rag)}</td></tr>`;
+}
+function personaBlock(title, kpis, f, hlIdx) {
+  return `<div class="persona-block">
+    <div class="pblock-head"><h4>${title}</h4><span class="sub">${kpis.length} KPIs · source across ClickUp · Smallest.ai · N8N · App · Ads · Razorpay</span></div>
+    <div class="mgrid three">${kpis.slice(0, 6).map((k, i) => kpiCard(k, f, i === hlIdx)).join("")}</div>
+    <div class="table-wrap" style="margin-top:12px"><table>
+      <thead><tr><th>KPI</th><th>Source</th><th class="num">Current</th><th class="num">Target</th><th>RAG</th></tr></thead>
+      <tbody>${kpis.map((k) => kpiRow(k, f)).join("")}</tbody></table></div>
+  </div>`;
+}
+
+let scoreView = "all";
+function renderScorecard(key) {
+  const f = SCORE_F[key] || 1;
+  setHTML("northStars", NORTH.map((k) => {
+    const rag = ragOf(k.base, k.target, k.dir);
+    return `<div class="kpi"><div class="k-label">${k.name}</div><div class="k-val" style="color:${ragColor(rag)}">${fmtVal(k.base, k.unit)}</div>
+      <div class="k-sub">target ${fmtVal(k.target, k.unit)} · ${k.owner} ${dot(rag)}</div></div>`;
+  }).join(""));
+  setHTML("matrixSub", PERIODS[key].label);
+  setHTML("matrixRows", MATRIX.map((r) => `<tr>
+    <td><span class="cname">${r.cat}</span></td>
+    ${["sales", "marketing", "product"].map((p) => {
+      const cell = r[p];
+      if (cell[2] === "na") return `<td class="muted">—</td>`;
+      return `<td><div class="mxcell"><span>${cell[0]}<br><b>${cell[1]}</b></span>${dot(cell[2])}</div></td>`;
+    }).join("")}
+  </tr>`).join(""));
+
+  const blocks = [];
+  if (scoreView === "all" || scoreView === "sales") blocks.push(personaBlock("Sales", P_SALES, f, 3));
+  if (scoreView === "all" || scoreView === "marketing") blocks.push(personaBlock("Marketing", P_MARKETING, f, 6));
+  if (scoreView === "all" || scoreView === "product") blocks.push(personaBlock("Product", P_PRODUCT, f, 4));
+  setHTML("scorePersona", blocks.join(""));
+
+  setHTML("ovInsight", `<span class="ico">i</span><div><b>Blended read:</b> marketing efficiency (CAC, dormant leads) and product engagement (session length, adoption) are the two red zones;
+    sales conversion is stable but show-up (71%) drags win rate. Everything here is stitched from ClickUp (funnel), Smallest.ai (show-up), N8N (automation) and app events — the unification the brief flags as the biggest gap.</div>`);
+}
+
+function renderSystems() {
+  setHTML("sourceCards", SOURCES.map((s) => `<div class="mcard"><div class="mlab">${s.name} ${dot(s.status)}</div>
+    <div class="mval" style="font-size:16px">${s.complete}% complete</div>
+    <div class="mmeta">${s.role} · sync ${s.sync} · fresh ${s.fresh}</div></div>`).join(""));
+  setHTML("flowRows", FLOWS.map((x) => `<tr><td><span class="cname">${x.name}</span></td><td class="muted">${x.feeds}</td>
+    <td class="num">${IN.format(x.runs)}</td><td class="num" style="color:${x.failed > 20 ? "var(--danger)" : "inherit"}">${x.failed}</td>
+    <td class="num">${x.uptime}%</td><td>${dot(x.status)}</td></tr>`).join(""));
+  setHTML("gapInsight", `<span class="ico">!</span><div><b>The gap:</b> metrics live across ClickUp / Smallest.ai / N8N with no single scorecard.
+    Smallest.ai call-outcome tagging is only <b>78% complete</b> (41 failed syncs) — auto-computing show-up needs structured <code>set/attended/no-show</code> events.
+    Fix the two amber sources + add app feature-event tracking and this whole scorecard runs with <b>zero manual exports</b>.</div>`);
+}
+
 /* ---------- drill-down definitions ---------- */
 const DRILLS = {
   /* --- KPI cards --- */
@@ -681,6 +849,8 @@ function render(key) {
   renderFunnel(d);
   renderCampaigns(d);
   renderRCA(d);
+  renderScorecard(key);
+  renderSystems();
 }
 
 function showPage(name) {
@@ -689,6 +859,30 @@ function showPage(name) {
   const heading = document.getElementById("pageHeading");
   if (heading) heading.textContent = PAGE_TITLES[name] || "GTM Tracker";
   window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+/* ---------- role gate ---------- */
+let currentRole = null;
+function buildRoleGrid() {
+  setHTML("roleGrid", Object.entries(ROLES).map(([k, r]) => `<button class="role-card" data-role="${k}">
+    <span class="rc-icon">${r.icon}</span>
+    <span class="rc-name">${r.name}</span>
+    <span class="rc-blurb">${r.blurb}</span>
+  </button>`).join(""));
+}
+function openRoleScreen() { document.getElementById("roleScreen").classList.remove("hidden"); }
+function pickRole(key) {
+  const r = ROLES[key];
+  if (!r) return;
+  currentRole = key;
+  if (r.route) { window.location.href = r.route; return; }
+  document.getElementById("roleScreen").classList.add("hidden");
+  setHTML("roleName", r.name);
+  scoreView = r.persona;
+  document.querySelectorAll("#scoreToggle button").forEach((b) => b.classList.toggle("active", b.dataset.p === scoreView));
+  const period = document.getElementById("period");
+  render(period.value);
+  showPage(r.page);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -706,6 +900,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("#campFilter button").forEach((b) => b.classList.toggle("active", b === btn));
     renderCampaigns(getData(period.value));
   });
+
+  document.getElementById("scoreToggle").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    scoreView = btn.dataset.p;
+    document.querySelectorAll("#scoreToggle button").forEach((b) => b.classList.toggle("active", b === btn));
+    renderScorecard(period.value);
+  });
+
+  buildRoleGrid();
+  document.getElementById("roleGrid").addEventListener("click", (e) => {
+    const card = e.target.closest("[data-role]");
+    if (card) pickRole(card.dataset.role);
+  });
+  document.getElementById("roleChip").addEventListener("click", openRoleScreen);
 
   document.getElementById("printBtn").addEventListener("click", () => window.print());
 
